@@ -1,0 +1,9 @@
+{
+    // Suffix under which container searches will be made (e.g. "mycontainer.docker").
+    // Other suffixes will be ignored.
+    "Suffix": "docker",
+
+    // Whether to include the docker-compose project name in the searched FQDN.
+    // E.g.: "myservice.myproject.docker"
+    "IncludeComposeProject": true
+}

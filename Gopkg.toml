@@ -1,0 +1,4 @@
+
+[[constraint]]
+  name = "docker.io/go-docker"
+  version = "1.0.0"
