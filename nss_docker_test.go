@@ -31,14 +31,14 @@ type testClient struct{}
 
 func (testClient) ContainerList(_ context.Context, _ types.ContainerListOptions) ([]types.Container, error) {
 	return []types.Container{
-		types.Container{
+		{
 			ID:     "foo",
 			Labels: map[string]string{},
 			Names: []string{
 				"/someservice",
 			},
 		},
-		types.Container{
+		{
 			ID: "bar",
 			Labels: map[string]string{
 				"com.docker.compose.project": "someproject",
@@ -47,7 +47,7 @@ func (testClient) ContainerList(_ context.Context, _ types.ContainerListOptions)
 				"/someproject_someotherservice_1",
 			},
 		},
-		types.Container{
+		{
 			ID: "baz",
 			Labels: map[string]string{
 				"com.docker.compose.project": "someotherproject",
@@ -65,7 +65,7 @@ func (testClient) ContainerInspect(_ context.Context, name string) (types.Contai
 		return types.ContainerJSON{
 			NetworkSettings: &types.NetworkSettings{
 				Networks: map[string]*network.EndpointSettings{
-					"default": &network.EndpointSettings{
+					"default": {
 						IPAddress: "1.2.3.4",
 						Aliases: []string{
 							"somealias",
@@ -78,7 +78,7 @@ func (testClient) ContainerInspect(_ context.Context, name string) (types.Contai
 		return types.ContainerJSON{
 			NetworkSettings: &types.NetworkSettings{
 				Networks: map[string]*network.EndpointSettings{
-					"default": &network.EndpointSettings{
+					"default": {
 						IPAddress: "2.3.4.5",
 						Aliases: []string{
 							"someotheralias",
@@ -92,7 +92,7 @@ func (testClient) ContainerInspect(_ context.Context, name string) (types.Contai
 		return types.ContainerJSON{
 			NetworkSettings: &types.NetworkSettings{
 				Networks: map[string]*network.EndpointSettings{
-					"default": &network.EndpointSettings{
+					"default": {
 						IPAddress: "3.4.5.6",
 						Aliases: []string{
 							"yetanotheralias",
