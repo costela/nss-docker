@@ -216,8 +216,8 @@ func Test_queryDockerForName(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// temporarily override config global
-			defer func(configStruct) {
-				config = config
+			defer func(cfg configStruct) {
+				config = cfg
 			}(config)
 			config = tt.config
 
