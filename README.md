@@ -1,5 +1,7 @@
 # nss-docker
 
+[![Build Status](https://travis-ci.org/costela/nss-docker.svg?branch=master)](https://travis-ci.org/costela/nss-docker)
+
 Simple backend plugin for `libc`'s [name service switch](http://www.gnu.org/software/libc/manual/html_node/Name-Service-Switch.html) to query a local docker for running containers.
 
 This enables resolving containers' IPs locally based on container name.

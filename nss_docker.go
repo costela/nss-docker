@@ -151,13 +151,21 @@ func notfound(errnop *C.int, herrnop *C.int) C.enum_nss_status {
 	return C.NSS_STATUS_NOTFOUND
 }
 
-func queryDockerForName(client *docker.Client, fqdn string) (aliases, addresses []string, err error) {
+type dockerClienter interface {
+	ContainerList(context.Context, types.ContainerListOptions) ([]types.Container, error)
+	ContainerInspect(context.Context, string) (types.ContainerJSON, error)
+}
+
+func queryDockerForName(client dockerClienter, fqdn string) ([]string, []string, error) {
 	containers, err := client.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {
 		return nil, nil, err
 	}
 
-	hostname := strings.TrimSuffix(fqdn, config.Suffix)
+	aliases := []string{}
+	addresses := []string{}
+
+	search := strings.TrimSuffix(fqdn, config.Suffix)
 
 	var tmpAliases []string
 	var tmpAddresses []string
@@ -184,7 +192,7 @@ func queryDockerForName(client *docker.Client, fqdn string) (aliases, addresses 
 		// names are trimmed for the compose case, but more useful for the non-compose case
 		for _, name := range container.Names {
 			name = maybeAppendProject(strings.Trim(name, "/"), config.IncludeComposeProject)
-			found = (found || name == hostname)
+			found = (found || name == search)
 			tmpAliases = append(tmpAliases, fmt.Sprintf("%s%s", name, config.Suffix))
 		}
 
@@ -192,7 +200,7 @@ func queryDockerForName(client *docker.Client, fqdn string) (aliases, addresses 
 			tmpAddresses = append(tmpAddresses, endpoint.IPAddress)
 			for _, alias := range endpoint.Aliases {
 				alias = maybeAppendProject(alias, config.IncludeComposeProject)
-				found = (found || alias == hostname)
+				found = (found || alias == search)
 				tmpAliases = append(tmpAliases, fmt.Sprintf("%s%s", alias, config.Suffix))
 			}
 		}

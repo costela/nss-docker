@@ -26,4 +26,4 @@ before_install:
 before_script:
   - "dep ensure -vendor-only"
 
-script: go test
+script: go test -v
