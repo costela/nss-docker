@@ -5,7 +5,7 @@
 
 Simple backend plugin for `libc`'s [name service switch](http://www.gnu.org/software/libc/manual/html_node/Name-Service-Switch.html) to query a local docker for running containers.
 
-This enables resolving containers' IPs locally based on container name.
+This enables resolving containers' IPs locally based on container name or alias.
 
 Additionally, `nss-docker` supports `docker-compose` by optionally organizing containers' domain names by project.
 
@@ -31,9 +31,12 @@ The configuration is stored as JSON and searched in this order: `~/.nss_docker.j
 The following configuration keys are currently supported:
 
 * `Suffix`: (default: `.docker`) the TLD which will be appended to all containers. Searches not under this TLD will
-bypass this plugin.
+bypass this plugin.  
+This is useful if you want to test something using OAuth locally, since you can simulate real TLDs (which, of course,
+will be shadowed by the `nss-docker` domains)
 * `IncludeComposeProject`: (default: `true`) whether to include the `docker-compose` project name in the search. When
-true, services will be found with the form `SERVICE.PROJECT.SUFFIX`.
+true, services will be found with the form `SERVICE.PROJECT.SUFFIX`. Otherwise only `SERVICE.SUFFIX` will be searched,
+which simplifies names, but increases collision risk.
 
 ## Multiple docker-compose projects
 
@@ -47,7 +50,7 @@ An alternative to this approach would be to disable project-based search (`Inclu
 settings) and use aliases to make those services unique which you wish to make accessible:
 
 In `projectA/docker-compose.yml`:
-```
+```yaml
 services:
   frontend:
     ...
@@ -59,7 +62,7 @@ services:
 ```
 
 And in `projectB/docker-compose.yml`:
-```
+```yaml
 services:
   frontend:
     ...
@@ -78,7 +81,7 @@ The approach taken by this plugin will not enable containers to resolve accross 
 To solve this particular need, a possible solution would be to use `docker-compose`'s shared network (introduced with configuration file version 3.5, `docker-compose` version ):
 
 In project A:
-```
+```yaml
 services:
   serviceA:
     networks:
@@ -90,7 +93,7 @@ networks:
 ```
 
 In project B:
-```
+```yaml
 services:
   serviceB:
     networks:
