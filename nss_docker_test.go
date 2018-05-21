@@ -32,14 +32,14 @@ type testClient struct{}
 func (testClient) ContainerList(_ context.Context, _ types.ContainerListOptions) ([]types.Container, error) {
 	return []types.Container{
 		{
-			ID:     "foo",
+			ID:     "service1",
 			Labels: map[string]string{},
 			Names: []string{
 				"/someservice",
 			},
 		},
 		{
-			ID: "bar",
+			ID: "service2",
 			Labels: map[string]string{
 				"com.docker.compose.project": "someproject",
 			},
@@ -48,7 +48,7 @@ func (testClient) ContainerList(_ context.Context, _ types.ContainerListOptions)
 			},
 		},
 		{
-			ID: "baz",
+			ID: "service3",
 			Labels: map[string]string{
 				"com.docker.compose.project": "someotherproject",
 			},
@@ -56,12 +56,21 @@ func (testClient) ContainerList(_ context.Context, _ types.ContainerListOptions)
 				"/someotherproject_someotherservice_1",
 			},
 		},
+		{
+			ID: "service4",
+			Labels: map[string]string{
+				"com.docker.compose.project": "someproject",
+			},
+			Names: []string{
+				"/someproject_someservice_1",
+			},
+		},
 	}, nil
 }
 
 func (testClient) ContainerInspect(_ context.Context, name string) (types.ContainerJSON, error) {
 	switch name {
-	case "foo":
+	case "service1":
 		return types.ContainerJSON{
 			NetworkSettings: &types.NetworkSettings{
 				Networks: map[string]*network.EndpointSettings{
@@ -74,7 +83,7 @@ func (testClient) ContainerInspect(_ context.Context, name string) (types.Contai
 				},
 			},
 		}, nil
-	case "bar":
+	case "service2":
 		return types.ContainerJSON{
 			NetworkSettings: &types.NetworkSettings{
 				Networks: map[string]*network.EndpointSettings{
@@ -88,7 +97,7 @@ func (testClient) ContainerInspect(_ context.Context, name string) (types.Contai
 				},
 			},
 		}, nil
-	case "baz":
+	case "service3":
 		return types.ContainerJSON{
 			NetworkSettings: &types.NetworkSettings{
 				Networks: map[string]*network.EndpointSettings{
@@ -97,6 +106,20 @@ func (testClient) ContainerInspect(_ context.Context, name string) (types.Contai
 						Aliases: []string{
 							"yetanotheralias",
 							"nonuniquealias",
+						},
+					},
+				},
+			},
+		}, nil
+	case "service4":
+		return types.ContainerJSON{
+			NetworkSettings: &types.NetworkSettings{
+				Networks: map[string]*network.EndpointSettings{
+					"default": {
+						IPAddress: "4.5.6.7",
+						Aliases: []string{
+							"somesimplealias",
+							"some.full.alias.mysuffix",
 						},
 					},
 				},
@@ -125,8 +148,8 @@ func Test_queryDockerForName(t *testing.T) {
 			args: args{
 				fqdn: "someservice",
 			},
-			wantAliases:   []string{"someservice.docker", "somealias.docker"},
-			wantAddresses: []string{"1.2.3.4"},
+			wantAliases:   []string{},
+			wantAddresses: []string{},
 			wantErr:       false,
 		},
 		{
@@ -210,6 +233,28 @@ func Test_queryDockerForName(t *testing.T) {
 			},
 			wantAliases:   []string{},
 			wantAddresses: []string{},
+			wantErr:       false,
+		},
+		{
+			name:   "only full fqdn alias",
+			config: configStruct{Suffix: ".mysuffix", IncludeComposeProject: false},
+			args: args{
+				fqdn: "some.full.alias.mysuffix",
+			},
+			// TODO: is this the most untuitive behavior for IncludeSuffix:true? The non-full
+			// matches are purely informational, since they can never be resolved through the plugin.
+			wantAliases:   []string{"someproject_someservice_1.mysuffix", "somesimplealias.mysuffix", "some.full.alias.mysuffix"},
+			wantAddresses: []string{"4.5.6.7"},
+			wantErr:       false,
+		},
+		{
+			name:   "only full fqdn alias with project",
+			config: configStruct{Suffix: ".mysuffix", IncludeComposeProject: true},
+			args: args{
+				fqdn: "some.full.alias.mysuffix",
+			},
+			wantAliases:   []string{"someproject_someservice_1.someproject.mysuffix", "somesimplealias.someproject.mysuffix", "some.full.alias.mysuffix"},
+			wantAddresses: []string{"4.5.6.7"},
 			wantErr:       false,
 		},
 	}

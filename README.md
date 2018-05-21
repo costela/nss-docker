@@ -109,4 +109,4 @@ This should enable you to resolve and access `serviceB` from `serviceA` and vice
 
 ### Memory consumption
 
-This version of the plugin is written in Go, which means an automatic significant increase in memory usage. A future version will probably be rewritten in pure C to avoid this.
+This version of the plugin is written in Go, which means an automatic significant increase in memory usage. A future version may be rewritten in pure C to avoid this.

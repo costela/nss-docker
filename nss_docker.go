@@ -156,7 +156,7 @@ type dockerClienter interface {
 	ContainerInspect(context.Context, string) (types.ContainerJSON, error)
 }
 
-func queryDockerForName(client dockerClienter, fqdn string) ([]string, []string, error) {
+func queryDockerForName(client dockerClienter, search string) ([]string, []string, error) {
 	containers, err := client.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {
 		return nil, nil, err
@@ -165,7 +165,9 @@ func queryDockerForName(client dockerClienter, fqdn string) ([]string, []string,
 	aliases := []string{}
 	addresses := []string{}
 
-	search := strings.TrimSuffix(fqdn, config.Suffix)
+	normalizeOutput := func(s string) string {
+		return fmt.Sprintf("%s%s", strings.TrimSuffix(s, config.Suffix), config.Suffix)
+	}
 
 	var tmpAliases []string
 	var tmpAddresses []string
@@ -175,11 +177,14 @@ func queryDockerForName(client dockerClienter, fqdn string) ([]string, []string,
 		tmpAliases = []string{}
 		tmpAddresses = []string{}
 
-		maybeAppendProject := func(s string, doit bool) string {
-			if p, ok := container.Labels["com.docker.compose.project"]; ok && doit {
-				return fmt.Sprintf("%s.%s", s, p)
+		normalizeName := func(s string) string {
+			if strings.HasSuffix(s, config.Suffix) {
+				return s
 			}
-			return s
+			if p, ok := container.Labels["com.docker.compose.project"]; ok && config.IncludeComposeProject {
+				s = fmt.Sprintf("%s.%s", s, p)
+			}
+			return fmt.Sprintf("%s%s", s, config.Suffix)
 		}
 
 		// ContainerList does not return all info, like Aliases
@@ -191,17 +196,17 @@ func queryDockerForName(client dockerClienter, fqdn string) ([]string, []string,
 
 		// names are trimmed for the compose case, but more useful for the non-compose case
 		for _, name := range container.Names {
-			name = maybeAppendProject(strings.Trim(name, "/"), config.IncludeComposeProject)
+			name = normalizeName(strings.Trim(name, "/"))
 			found = (found || name == search)
-			tmpAliases = append(tmpAliases, fmt.Sprintf("%s%s", name, config.Suffix))
+			tmpAliases = append(tmpAliases, normalizeOutput(name))
 		}
 
 		for _, endpoint := range containerJSON.NetworkSettings.Networks {
 			tmpAddresses = append(tmpAddresses, endpoint.IPAddress)
 			for _, alias := range endpoint.Aliases {
-				alias = maybeAppendProject(alias, config.IncludeComposeProject)
+				alias = normalizeName(alias)
 				found = (found || alias == search)
-				tmpAliases = append(tmpAliases, fmt.Sprintf("%s%s", alias, config.Suffix))
+				tmpAliases = append(tmpAliases, normalizeOutput(alias))
 			}
 		}
 
