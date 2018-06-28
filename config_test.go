@@ -65,6 +65,7 @@ func Test_normalizeSuffix(t *testing.T) {
 		want string
 	}{
 		{"no_dot", "suffix", ".suffix"},
+		{"noop", ".suffix", ".suffix"},
 		{"two_dots", "..suffix", ".suffix"},
 		{"dot_end", "suffix.", ".suffix"},
 	}
