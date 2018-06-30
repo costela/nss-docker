@@ -36,6 +36,9 @@ var config = configStruct{
 	IncludeComposeProject: true,
 }
 
+// used for tests; untouched by init()
+var testConfig = config
+
 func parseConfig(r io.Reader) error {
 	cleaned, err := removeCommentLines(r)
 	if err != nil {

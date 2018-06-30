@@ -144,7 +144,7 @@ func Test_queryDockerForName(t *testing.T) {
 	}{
 		{
 			name:   "individual container without suffix",
-			config: config,
+			config: testConfig,
 			args: args{
 				fqdn: "someservice",
 			},
@@ -154,7 +154,7 @@ func Test_queryDockerForName(t *testing.T) {
 		},
 		{
 			name:   "nonexistent container",
-			config: config,
+			config: testConfig,
 			args: args{
 				fqdn: "somenonservice",
 			},
@@ -164,7 +164,7 @@ func Test_queryDockerForName(t *testing.T) {
 		},
 		{
 			name:   "fqdn search",
-			config: config,
+			config: testConfig,
 			args: args{
 				fqdn: "someservice.docker",
 			},
@@ -174,7 +174,7 @@ func Test_queryDockerForName(t *testing.T) {
 		},
 		{
 			name:   "fqdn project search",
-			config: config,
+			config: testConfig,
 			args: args{
 				fqdn: "someotheralias.someproject.docker",
 			},
@@ -184,7 +184,7 @@ func Test_queryDockerForName(t *testing.T) {
 		},
 		{
 			name:   "non-unique alias inside project",
-			config: config,
+			config: testConfig,
 			args: args{
 				fqdn: "nonuniquealias.someproject.docker",
 			},
