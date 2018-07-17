@@ -1,5 +1,5 @@
-nss_docker.so:
-	go build -o nss_docker.so -buildmode=c-shared *.go
+nss_docker.so: *.go
+	go build -o nss_docker.so -buildmode=c-shared -ldflags '-extldflags "-Wl,-soname,nss_docker.so.2"'
 
 # dirty hack to avoid needing autoconf
 # would be nice to also get SONAME dynamically
