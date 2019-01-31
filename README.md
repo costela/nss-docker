@@ -1,7 +1,9 @@
-# nss-docker
-
 [![Build Status](https://travis-ci.org/costela/nss-docker.svg?branch=master)](https://travis-ci.org/costela/nss-docker)
 [![Go Report Card](https://goreportcard.com/badge/github.com/costela/nss-docker)](https://goreportcard.com/report/github.com/costela/nss-docker)
+
+**NOTE**: This project is a proof-of-concept. For an easier, more portable solution, try [docker-etchosts](/costela/docker-etchosts).
+
+# nss-docker
 
 Simple backend plugin for `libc`'s [name service switch](http://www.gnu.org/software/libc/manual/html_node/Name-Service-Switch.html) to query a local docker for running containers.
 
@@ -74,6 +76,10 @@ services:
 ```
 
 ## Limitations
+
+### Linux-only
+
+Since this project builds on libc's [name service switch](http://www.gnu.org/software/libc/manual/html_node/Name-Service-Switch.html), it is only compatible with Linux.
 
 ### Cross-container name resolution
 
