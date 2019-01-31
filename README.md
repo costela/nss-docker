@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/costela/nss-docker.svg?branch=master)](https://travis-ci.org/costela/nss-docker)
 [![Go Report Card](https://goreportcard.com/badge/github.com/costela/nss-docker)](https://goreportcard.com/report/github.com/costela/nss-docker)
 
-**NOTE**: This project is a proof-of-concept. For an easier, more portable solution, try [docker-etchosts](/costela/docker-etchosts).
+**NOTE**: This project is a proof-of-concept. For an easier, more portable solution, try [docker-etchosts](https://github.com/costela/docker-etchosts).
 
 # nss-docker
 
